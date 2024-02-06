@@ -186,9 +186,11 @@ void nmbs_set_platform_arg(nmbs_t* nmbs, void* arg) {
 
 uint16_t nmbs_crc_calc(const uint8_t* data, uint32_t length) {
     uint16_t crc = 0xFFFF;
-    for (uint32_t i = 0; i < length; i++) {
+    uint32_t i = 0;
+    int j = 8;
+    for (i = 0; i < length; i++) {
         crc ^= (uint16_t) data[i];
-        for (int j = 8; j != 0; j--) {
+        for (j = 8; j != 0; j--) {
             if ((crc & 0x0001) != 0) {
                 crc >>= 1;
                 crc ^= 0xA001;
@@ -472,7 +474,8 @@ static nmbs_error recv_read_discrete_res(nmbs_t* nmbs, nmbs_bitfield values) {
         return err;
 
     NMBS_DEBUG_PRINT("coils ");
-    for (int i = 0; i < coils_bytes; i++) {
+    int i = 0;
+    for (i = 0; i < coils_bytes; i++) {
         uint8_t coil = get_1(nmbs);
         if (values)
             values[i] = coil;
@@ -504,7 +507,8 @@ static nmbs_error recv_read_registers_res(nmbs_t* nmbs, uint16_t quantity, uint1
         return err;
 
     NMBS_DEBUG_PRINT("regs ");
-    for (int i = 0; i < registers_bytes / 2; i++) {
+    int i = 0;
+    for (i = 0; i < registers_bytes / 2; i++) {
         uint16_t reg = get_2(nmbs);
         if (registers)
             registers[i] = reg;
@@ -763,7 +767,8 @@ static nmbs_error handle_read_discrete(nmbs_t* nmbs,
                 NMBS_DEBUG_PRINT("b %d\t", discrete_bytes);
 
                 NMBS_DEBUG_PRINT("coils ");
-                for (int i = 0; i < discrete_bytes; i++) {
+                int i = 0;
+                for (i = 0; i < discrete_bytes; i++) {
                     put_1(nmbs, bitfield[i]);
                     NMBS_DEBUG_PRINT("%d ", bitfield[i]);
                 }
@@ -828,7 +833,8 @@ static nmbs_error handle_read_registers(nmbs_t* nmbs,
                 NMBS_DEBUG_PRINT("b %d\t", regs_bytes);
 
                 NMBS_DEBUG_PRINT("regs ");
-                for (int i = 0; i < quantity; i++) {
+                int i = 0;
+                for (i = 0; i < quantity; i++) {
                     put_2(nmbs, regs[i]);
                     NMBS_DEBUG_PRINT("%d ", regs[i]);
                 }
@@ -1000,7 +1006,8 @@ static nmbs_error handle_write_multiple_coils(nmbs_t* nmbs) {
         return err;
 
     nmbs_bitfield coils = {0};
-    for (int i = 0; i < coils_bytes; i++) {
+    int i = 0;
+    for (i = 0; i < coils_bytes; i++) {
         coils[i] = get_1(nmbs);
         NMBS_DEBUG_PRINT("%d ", coils[i]);
     }
@@ -1073,7 +1080,8 @@ static nmbs_error handle_write_multiple_registers(nmbs_t* nmbs) {
         return err;
 
     uint16_t registers[0x007B];
-    for (int i = 0; i < registers_bytes / 2; i++) {
+    int i = 0;
+    for (i = 0; i < registers_bytes / 2; i++) {
         registers[i] = get_2(nmbs);
         NMBS_DEBUG_PRINT("%d ", registers[i]);
     }
@@ -1158,7 +1166,8 @@ static nmbs_error handle_read_file_record(nmbs_t* nmbs) {
 
     uint8_t response_data_size = 0;
 
-    for (uint8_t i = 0; i < subreq_count; i++) {
+    uint8_t i = 0;
+    for (i = 0; i < subreq_count; i++) {
         subreq[i].reference_type = get_1(nmbs);
         subreq[i].file_number = get_2(nmbs);
         subreq[i].record_number = get_2(nmbs);
@@ -1179,8 +1188,9 @@ static nmbs_error handle_read_file_record(nmbs_t* nmbs) {
 
         if (request_size < 0x07 || request_size > 0xF5)
             return send_exception_msg(nmbs, NMBS_EXCEPTION_ILLEGAL_DATA_VALUE);
-
-        for (uint8_t i = 0; i < subreq_count; i++) {
+        
+        uint8_t i = 0;
+        for (i = 0; i < subreq_count; i++) {
             if (subreq[i].reference_type != 0x06)
                 return send_exception_msg(nmbs, NMBS_EXCEPTION_ILLEGAL_DATA_ADDRESS);
 
@@ -1201,7 +1211,8 @@ static nmbs_error handle_read_file_record(nmbs_t* nmbs) {
         put_1(nmbs, response_data_size);
 
         if (nmbs->callbacks.read_file_record) {
-            for (uint8_t i = 0; i < subreq_count; i++) {
+            uint8_t i = 0;
+            for (i = 0; i < subreq_count; i++) {
                 uint16_t subreq_data_size = subreq[i].record_length * 2;
                 put_1(nmbs, subreq_data_size + 1);
                 put_1(nmbs, 0x06);    // add Reference Type const
@@ -1367,7 +1378,8 @@ static nmbs_error handle_read_write_registers(nmbs_t* nmbs) {
 #else
     uint16_t registers[byte_count_write / 2];
 #endif
-    for (int i = 0; i < byte_count_write / 2; i++) {
+    int i = 0;
+    for (i = 0; i < byte_count_write / 2; i++) {
         registers[i] = get_2(nmbs);
         NMBS_DEBUG_PRINT("%d ", registers[i]);
     }
@@ -1427,7 +1439,8 @@ static nmbs_error handle_read_write_registers(nmbs_t* nmbs) {
             NMBS_DEBUG_PRINT("b %d\t", regs_bytes);
 
             NMBS_DEBUG_PRINT("regs ");
-            for (int i = 0; i < read_quantity; i++) {
+            int i = 0;
+            for (i = 0; i < read_quantity; i++) {
                 put_2(nmbs, regs[i]);
                 NMBS_DEBUG_PRINT("%d ", regs[i]);
             }
@@ -1714,7 +1727,8 @@ nmbs_error nmbs_write_multiple_coils(nmbs_t* nmbs, uint16_t address, uint16_t qu
     NMBS_DEBUG_PRINT("a %d\tq %d\tb %d\t", address, quantity, coils_bytes);
 
     NMBS_DEBUG_PRINT("coils ");
-    for (int i = 0; i < coils_bytes; i++) {
+    int i = 0;
+    for (i = 0; i < coils_bytes; i++) {
         put_1(nmbs, coils[i]);
         NMBS_DEBUG_PRINT("%d ", coils[i]);
     }
@@ -1748,7 +1762,8 @@ nmbs_error nmbs_write_multiple_registers(nmbs_t* nmbs, uint16_t address, uint16_
     NMBS_DEBUG_PRINT("a %d\tq %d\tb %d\t", address, quantity, registers_bytes);
 
     NMBS_DEBUG_PRINT("regs ");
-    for (int i = 0; i < quantity; i++) {
+    int i = 0;
+    for (i = 0; i < quantity; i++) {
         put_2(nmbs, registers[i]);
         NMBS_DEBUG_PRINT("%d ", registers[i]);
     }
@@ -1860,7 +1875,8 @@ nmbs_error nmbs_read_write_registers(nmbs_t* nmbs, uint16_t read_address, uint16
     NMBS_DEBUG_PRINT("write a %d\tq %d\tb %d\t", write_address, write_quantity, registers_bytes);
 
     NMBS_DEBUG_PRINT("regs ");
-    for (int i = 0; i < write_quantity; i++) {
+    int i = 0;
+    for (i = 0; i < write_quantity; i++) {
         put_2(nmbs, registers[i]);
         NMBS_DEBUG_PRINT("%d ", registers[i]);
     }
@@ -1881,7 +1897,8 @@ nmbs_error nmbs_send_raw_pdu(nmbs_t* nmbs, uint8_t fc, const uint8_t* data, uint
     put_msg_header(nmbs, data_len);
 
     NMBS_DEBUG_PRINT("raw ");
-    for (uint16_t i = 0; i < data_len; i++) {
+    uint16_t i = 0;
+    for (i = 0; i < data_len; i++) {
         put_1(nmbs, data[i]);
         NMBS_DEBUG_PRINT("%d ", data[i]);
     }
@@ -1898,8 +1915,9 @@ nmbs_error nmbs_receive_raw_pdu_response(nmbs_t* nmbs, uint8_t* data_out, uint16
     err = recv(nmbs, data_out_len);
     if (err != NMBS_ERROR_NONE)
         return err;
-
-    for (uint16_t i = 0; i < data_out_len; i++) {
+    
+    uint16_t i = 0;
+    for (i = 0; i < data_out_len; i++) {
         data_out[i] = get_1(nmbs);
     }
 
